@@ -180,18 +180,19 @@ namespace GoogleCloudSamples
             });
 
             // Listen to pub/sub for the job
-            SubscriptionName subscriptionName = new SubscriptionName(opts.CallingProjectId,
-    opts.SubscriptionId);
+            SubscriptionName subscriptionName = 
+                new SubscriptionName(opts.CallingProjectId,
+                    opts.SubscriptionId);
             SubscriberClient subscriber = SubscriberClient.Create(
                 subscriptionName, new[] { SubscriberServiceApiClient.Create() });
             // SimpleSubscriber runs your message handle function on multiple
             // threads to maximize throughput.
-            bool done = false;
+            ManualResetEvent done = new ManualResetEvent(false); 
             Task t = subscriber.StartAsync(async (PubsubMessage message, CancellationToken cancel) =>
             {
                 if (message.Attributes["DlpJobName"] == submittedJob.Name)
                 {
-                    done = true;
+                    done.Set();
                     return SubscriberClient.Reply.Ack;
                 }
                 else
@@ -199,11 +200,7 @@ namespace GoogleCloudSamples
                     return SubscriberClient.Reply.Nack;
                 }
             });
-
-            // TODO this is gross
-            while (!done) {
-                Thread.Sleep(50);
-            }
+            done.WaitOne();
             subscriber.StopAsync(CancellationToken.None).Wait();
 
             // Process results
