@@ -53,7 +53,7 @@ namespace GoogleCloudSamples
         public string File { get; set; }
     }
 
-    public class Dlp
+    public partial class Dlp
     {
         static IEnumerable<InfoType> ParseInfoTypes(string infoTypesStr)
         {
@@ -147,9 +147,36 @@ namespace GoogleCloudSamples
 
         public static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<InspectStringOptions, InspectFileOptions>(args)
+            Parser.Default.ParseArguments<
+                InspectStringOptions,
+                InspectFileOptions,
+                CreateJobTriggerOptions,
+                DeleteJobTriggerOptions,
+                ListJobTriggersOptions,
+                ListJobsOptions,
+                DeleteJobOptions,
+                DeidentifyMaskingOptions,
+                DeidentifyDateShiftOptions,
+                ListInfoTypesOptions,
+                NumericalStatsOptions,
+                CategoricalStatsOptions,
+                KAnonymityOptions,
+                LDiversityOptions
+            >(args)
                 .MapResult(
+                (DeidentifyMaskingOptions opts) => DeidentifyMasking(opts),
+                (ListJobsOptions opts) => ListJobs(opts),
+                (DeleteJobOptions opts) => DeleteJob(opts),
+                (CreateJobTriggerOptions opts) => CreateJobTrigger(opts),
+                (ListJobTriggersOptions opts) => ListJobTriggers(opts),
+                (DeleteJobTriggerOptions opts) => DeleteJobTrigger(opts),
                 (InspectStringOptions opts) => InspectString(opts),
+                (DeidentifyDateShiftOptions opts) => DeidentifyDateShift(opts),
+                (ListInfoTypesOptions opts) => ListInfoTypes(opts),
+                (NumericalStatsOptions opts) => NumericalStats(opts),
+                (CategoricalStatsOptions opts) => CategoricalStats(opts),
+                (KAnonymityOptions opts) => KAnonymity(opts),
+                (LDiversityOptions opts) => LDiversity(opts),
                 (InspectFileOptions opts) => {
                     Console.WriteLine($"projectID: {opts.ProjectId}\nfile: {opts.File}\ninfoTypes: {opts.InfoTypes}\nlikelihood: {opts.MinLikelihood}\nmaxResults: {opts.MaxFindings}");
                     return InspectFile(opts); },
