@@ -28,7 +28,6 @@ namespace GoogleCloudSamples
 {
     public partial class Dlp
     {
-
         static void Quickstart()
         {
             // [START dlp_quickstart]
@@ -71,11 +70,13 @@ namespace GoogleCloudSamples
             });
 
             var Findings = response.Result.Findings;
-            if (Findings.Any()) {
+            if (Findings.Any())
+            {
                 Console.WriteLine("Findings: ");
                 foreach (Finding finding in Findings)
                 {
-                    if (!string.IsNullOrEmpty(finding.Quote)) {
+                    if (!string.IsNullOrEmpty(finding.Quote))
+                    {
                         Console.WriteLine($"  Quote: {finding.Quote}");
                     }
                     Console.WriteLine($"\tInfo type: { finding.InfoType.Name}");

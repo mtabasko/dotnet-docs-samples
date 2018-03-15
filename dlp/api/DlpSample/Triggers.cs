@@ -81,8 +81,9 @@ namespace GoogleCloudSamples
             };
 
             // Create the inspectConfig object
-            InspectConfig inspectConfig = new InspectConfig {
-                MinLikelihood = (Likelihood) Enum.Parse(typeof(Likelihood), opts.MinLikelihood),
+            InspectConfig inspectConfig = new InspectConfig
+            {
+                MinLikelihood = (Likelihood)Enum.Parse(typeof(Likelihood), opts.MinLikelihood),
                 Limits = limits
             };
             inspectConfig.InfoTypes.Add(new InfoType
@@ -95,16 +96,19 @@ namespace GoogleCloudSamples
             });
 
             // Create trigger
-            Trigger trigger = new Trigger {
+            Trigger trigger = new Trigger
+            {
                 Schedule = new Schedule
                 {
-                    RecurrencePeriodDuration = new Google.Protobuf.WellKnownTypes.Duration {
+                    RecurrencePeriodDuration = new Google.Protobuf.WellKnownTypes.Duration
+                    {
                         Seconds = opts.ScanPeriod * 60 * 60 * 24
                     }
                 }
             };
 
-            StorageConfig storageConfig = new StorageConfig {
+            StorageConfig storageConfig = new StorageConfig
+            {
                 CloudStorageOptions = new CloudStorageOptions
                 {
                     FileSet = new FileSet
@@ -114,12 +118,14 @@ namespace GoogleCloudSamples
                 }
             };
 
-            InspectJobConfig jobConfig = new InspectJobConfig {
+            InspectJobConfig jobConfig = new InspectJobConfig
+            {
                 InspectConfig = inspectConfig,
                 StorageConfig = storageConfig
             };
 
-            JobTrigger jobTrigger = new JobTrigger {
+            JobTrigger jobTrigger = new JobTrigger
+            {
                 Triggers = { trigger },
                 InspectJob = jobConfig,
                 Status = Status.Healthy,
@@ -138,7 +144,8 @@ namespace GoogleCloudSamples
             return 0;
         }
 
-        static object ListJobTriggers(ListJobTriggersOptions opts) {
+        static object ListJobTriggers(ListJobTriggersOptions opts)
+        {
             DlpServiceClient dlp = DlpServiceClient.Create();
 
             var response = dlp.ListJobTriggers(new ListJobTriggersRequest
@@ -146,7 +153,8 @@ namespace GoogleCloudSamples
                 Parent = $"projects/{opts.ProjectId}"
             });
 
-            foreach (var trigger in response) {
+            foreach (var trigger in response)
+            {
                 Console.WriteLine($"Name: {trigger.Name}");
                 Console.WriteLine($"  Created: {trigger.CreateTime.ToString()}");
                 Console.WriteLine($"  Updated: {trigger.UpdateTime.ToString()}");

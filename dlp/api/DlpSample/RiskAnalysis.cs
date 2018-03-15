@@ -1,4 +1,18 @@
-﻿using System;
+﻿// Copyright (c) 2018 Google LLC.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy of
+// the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations under
+// the License.
+
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -53,7 +67,7 @@ namespace GoogleCloudSamples
             [Value(3, HelpText = "The ID of the table to inspect. (e.g. 'my_table')", Required = true)]
             public string TableId { get; set; }
 
-            [Value(4, HelpText = "The name of the column to compute risk metrics for. (e.g. 'age')", Required =  true)]
+            [Value(4, HelpText = "The name of the column to compute risk metrics for. (e.g. 'age')", Required = true)]
             public string ColumnName { get; set; }
 
             [Value(5, HelpText = "The name of the Pub/Sub topic to notify once the job completes.", Required = true)]
@@ -79,7 +93,7 @@ namespace GoogleCloudSamples
             public string TableId { get; set; }
 
             [Value(4, HelpText = "A set of columns that form a composite key, delimited by commas. (e.g. 'name,city')", Required = true)]
-            public string QuasiIdColumns  { get; set; }
+            public string QuasiIdColumns { get; set; }
 
             [Value(5, HelpText = "The name of the Pub/Sub topic to notify once the job completes.", Required = true)]
             public string TopicId { get; set; }
@@ -150,18 +164,22 @@ namespace GoogleCloudSamples
             public string RegionCode { get; set; }
         }
 
-        static object NumericalStats(NumericalStatsOptions opts) {
+        static object NumericalStats(NumericalStatsOptions opts)
+        {
             DlpServiceClient dlp = DlpServiceClient.Create();
 
             // Construct + submit the job
             RiskAnalysisJobConfig config = new RiskAnalysisJobConfig
             {
-                PrivacyMetric = new PrivacyMetric {
-                    NumericalStatsConfig = new NumericalStatsConfig {
+                PrivacyMetric = new PrivacyMetric
+                {
+                    NumericalStatsConfig = new NumericalStatsConfig
+                    {
                         Field = new FieldId { Name = opts.ColumnName }
                     }
                 },
-                SourceTable = new BigQueryTable {
+                SourceTable = new BigQueryTable
+                {
                     ProjectId = opts.TableProjectId,
                     DatasetId = opts.DatasetId,
                     TableId = opts.TableId
@@ -169,25 +187,27 @@ namespace GoogleCloudSamples
             };
             config.Actions.Add(new Google.Cloud.Dlp.V2.Action
             {
-                PubSub = new PublishToPubSub{
+                PubSub = new PublishToPubSub
+                {
                     Topic = opts.TopicId
                 }
             });
 
-            var submittedJob = dlp.CreateDlpJob(new CreateDlpJobRequest {
+            var submittedJob = dlp.CreateDlpJob(new CreateDlpJobRequest
+            {
                 Parent = $"projects/{opts.CallingProjectId}",
                 RiskJob = config
             });
 
             // Listen to pub/sub for the job
-            SubscriptionName subscriptionName = 
+            SubscriptionName subscriptionName =
                 new SubscriptionName(opts.CallingProjectId,
                     opts.SubscriptionId);
             SubscriberClient subscriber = SubscriberClient.Create(
                 subscriptionName, new[] { SubscriberServiceApiClient.Create() });
             // SimpleSubscriber runs your message handle function on multiple
             // threads to maximize throughput.
-            ManualResetEvent done = new ManualResetEvent(false); 
+            ManualResetEvent done = new ManualResetEvent(false);
             Task t = subscriber.StartAsync((PubsubMessage message, CancellationToken cancel) =>
             {
                 if (message.Attributes["DlpJobName"] == submittedJob.Name)
@@ -305,7 +325,8 @@ namespace GoogleCloudSamples
                 Console.WriteLine($"  Least common value occurs {bucket.ValueFrequencyLowerBound} time(s).");
                 Console.WriteLine($"  {bucket.BucketSize} unique values total.");
 
-                foreach (var bucketValue in bucket.BucketValues) {
+                foreach (var bucketValue in bucket.BucketValues)
+                {
                     Console.WriteLine($"  Value {bucketValue.Value.ToString()} occurs {bucketValue.Count} time(s).");
                 }
             }
@@ -319,10 +340,11 @@ namespace GoogleCloudSamples
 
             // Construct + submit the job
             KAnonymityConfig KAnonymityConfig = new KAnonymityConfig();
-            foreach (string QuasiId in opts.QuasiIdColumns.Split(',')) {
-                KAnonymityConfig.QuasiIds.Add(new FieldId{ Name = QuasiId });
+            foreach (string QuasiId in opts.QuasiIdColumns.Split(','))
+            {
+                KAnonymityConfig.QuasiIds.Add(new FieldId { Name = QuasiId });
             }
-            
+
             RiskAnalysisJobConfig config = new RiskAnalysisJobConfig
             {
                 PrivacyMetric = new PrivacyMetric
@@ -408,8 +430,9 @@ namespace GoogleCloudSamples
             DlpServiceClient dlp = DlpServiceClient.Create();
 
             // Construct + submit the job
-            LDiversityConfig LDiversityConfig = new LDiversityConfig{
-                SensitiveAttribute = new FieldId {  Name = opts.SensitiveAttribute }
+            LDiversityConfig LDiversityConfig = new LDiversityConfig
+            {
+                SensitiveAttribute = new FieldId { Name = opts.SensitiveAttribute }
             };
             foreach (string QuasiId in opts.QuasiIdColumns.Split(','))
             {
@@ -491,7 +514,8 @@ namespace GoogleCloudSamples
                     Console.WriteLine($"    Quasi-ID values: [{String.Join(',', bucketValue.QuasiIdsValues.Select(x => x.ToString()))}]");
                     Console.WriteLine($"    Class size: {bucketValue.EquivalenceClassSize}");
 
-                    foreach (var topValue in bucketValue.TopSensitiveValues) {
+                    foreach (var topValue in bucketValue.TopSensitiveValues)
+                    {
                         Console.WriteLine($"    Sensitive value {topValue.Value.ToString()} occurs {topValue.Count} time(s).");
                     }
                 }
@@ -590,6 +614,5 @@ namespace GoogleCloudSamples
 
             return 0;
         }
-
     }
 }

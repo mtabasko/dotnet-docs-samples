@@ -102,7 +102,8 @@ namespace GoogleCloudSamples
             {
                 Parent = $"projects/{opts.ProjectId}",
                 DeidentifyConfig = deidConfig,
-                Item = new ContentItem {
+                Item = new ContentItem
+                {
                     Value = opts.Value
                 }
             });
@@ -122,7 +123,7 @@ namespace GoogleCloudSamples
             string[] CsvRows = CsvLines.Skip(1).ToArray();
 
             // Convert to protobuf format
-            var ProtoHeaders = CsvHeaders.Select(header => new FieldId{ Name = header });
+            var ProtoHeaders = CsvHeaders.Select(header => new FieldId { Name = header });
             var ProtoRows = CsvRows.Select(CsvRow =>
             {
                 var RowValues = CsvRow.Split(',');
@@ -146,7 +147,6 @@ namespace GoogleCloudSamples
                     {
                         StringValue = RowValue
                     };
-
                 });
 
                 var RowObject = new Table.Types.Row();
@@ -165,7 +165,8 @@ namespace GoogleCloudSamples
             bool hasKeyName = !String.IsNullOrEmpty(opts.KeyName);
             bool hasWrappedKey = !String.IsNullOrEmpty(opts.WrappedKey);
             bool hasContext = !String.IsNullOrEmpty(opts.ContextFieldId);
-            if (hasKeyName && hasWrappedKey && hasContext) {
+            if (hasKeyName && hasWrappedKey && hasContext)
+            {
                 Config.Context = new FieldId { Name = opts.ContextFieldId };
                 Config.CryptoKey = new CryptoKey
                 {
@@ -175,7 +176,9 @@ namespace GoogleCloudSamples
                         CryptoKeyName = opts.KeyName
                     }
                 };
-            } else if (hasKeyName || hasWrappedKey || hasContext) {
+            }
+            else if (hasKeyName || hasWrappedKey || hasContext)
+            {
                 throw new ArgumentException("Must specify ALL or NONE of: {contextFieldId, keyName, wrappedKey}!");
             }
 
@@ -200,7 +203,8 @@ namespace GoogleCloudSamples
             TableItem.Headers.Add(ProtoHeaders);
             TableItem.Rows.Add(ProtoRows);
 
-            var response = dlp.DeidentifyContent(new DeidentifyContentRequest {
+            var response = dlp.DeidentifyContent(new DeidentifyContentRequest
+            {
                 Parent = $"projects/{opts.ProjectId}",
                 DeidentifyConfig = deidConfig,
                 Item = new ContentItem
@@ -213,7 +217,8 @@ namespace GoogleCloudSamples
             List<String> OutputLines = new List<string>();
             OutputLines.Add(CsvLines[0]);
 
-            OutputLines.AddRange(response.Item.Table.Rows.Select(ProtoRow => {
+            OutputLines.AddRange(response.Item.Table.Rows.Select(ProtoRow =>
+            {
                 var Values = ProtoRow.Values.Select(ProtoValue =>
                 {
                     if (ProtoValue.DateValue != null)

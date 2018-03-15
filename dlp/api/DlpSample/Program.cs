@@ -83,7 +83,7 @@ namespace GoogleCloudSamples
             });
         }
 
-        static readonly Dictionary<string, ByteContentItem.Types.BytesType> fileTypes =
+        static readonly Dictionary<string, ByteContentItem.Types.BytesType> s_fileTypes =
             new Dictionary<string, ByteContentItem.Types.BytesType>()
         {
             {"bmp", ByteContentItem.Types.BytesType.ImageBmp},
@@ -107,12 +107,13 @@ namespace GoogleCloudSamples
                         ByteItem = new ByteContentItem
                         {
                             Data = ByteString.FromStream(fileStream),
-                            Type = fileTypes.GetValueOrDefault(new FileInfo(opts.File).Extension.ToLower(),
+                            Type = s_fileTypes.GetValueOrDefault(new FileInfo(opts.File).Extension.ToLower(),
                                     ByteContentItem.Types.BytesType.Unspecified)
                         }
                     }
                 });
-            } finally
+            }
+            finally
             {
                 fileStream.Close();
             }
@@ -177,9 +178,11 @@ namespace GoogleCloudSamples
                 (CategoricalStatsOptions opts) => CategoricalStats(opts),
                 (KAnonymityOptions opts) => KAnonymity(opts),
                 (LDiversityOptions opts) => LDiversity(opts),
-                (InspectFileOptions opts) => {
+                (InspectFileOptions opts) =>
+                {
                     Console.WriteLine($"projectID: {opts.ProjectId}\nfile: {opts.File}\ninfoTypes: {opts.InfoTypes}\nlikelihood: {opts.MinLikelihood}\nmaxResults: {opts.MaxFindings}");
-                    return InspectFile(opts); },
+                    return InspectFile(opts);
+                },
                 errs => 1);
         }
     }

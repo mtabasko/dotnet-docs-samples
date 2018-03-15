@@ -104,7 +104,6 @@ namespace GoogleCloudSamples
         }
     }
 
-
     //public class QuickStartTests
     //{
     //    readonly CommandLineRunner _quickStart = new CommandLineRunner()
