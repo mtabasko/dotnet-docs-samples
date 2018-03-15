@@ -188,16 +188,16 @@ namespace GoogleCloudSamples
             // SimpleSubscriber runs your message handle function on multiple
             // threads to maximize throughput.
             ManualResetEvent done = new ManualResetEvent(false); 
-            Task t = subscriber.StartAsync(async (PubsubMessage message, CancellationToken cancel) =>
+            Task t = subscriber.StartAsync((PubsubMessage message, CancellationToken cancel) =>
             {
                 if (message.Attributes["DlpJobName"] == submittedJob.Name)
                 {
                     done.Set();
-                    return SubscriberClient.Reply.Ack;
+                    return Task.FromResult(SubscriberClient.Reply.Ack);
                 }
                 else
                 {
-                    return SubscriberClient.Reply.Nack;
+                    return Task.FromResult(SubscriberClient.Reply.Nack);
                 }
             });
             done.WaitOne();
