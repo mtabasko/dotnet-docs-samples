@@ -294,9 +294,9 @@ namespace GoogleCloudSamples
                 writer.WriteRawValue(Google.Protobuf.JsonFormatter.Default
                     .Format((IMessage)value));
             }
-        }
         // [END monitoring_alert_restore_policies]
         // [END monitoring_alert_backup_policies]
+        }
 
         // [START monitoring_alert_replace_channels]
         static void ReplaceChannels(string projectId, string alertPolicyId,
